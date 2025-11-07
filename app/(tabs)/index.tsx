@@ -1,37 +1,115 @@
 import { ExpenseCard } from '@/components/ExpenseCard';
 import { useExpenses } from '@/context/ExpenseContext';
 import { Category, CATEGORY_COLORS, CATEGORY_ICONS } from '@/types/expense';
-import { ActivityIndicator, Alert, Linking, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, Linking, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HomeScreen() {
   const { expenses, getTotalSpending, getSpendingByCategory, isLoading } = useExpenses();
+  const [showScanner, setShowScanner] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false);
 
   const recentExpenses = expenses.slice(0, 5);
   const totalSpending = getTotalSpending();
 
-  const openGPay = async () => {
-    // GPay app deep link
-    const gpayUrl = 'gpay://upi';
-    // Fallback to Play Store if GPay is not installed
-    const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user';
+  const clearAllExpenses = async () => {
+    Alert.alert(
+      'Clear All Expenses',
+      'Are you sure you want to delete all expenses? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Import storage service
+              const { storageService } = await import('@/utils/storage');
+              await storageService.clearAllExpenses();
+              // Force reload by clearing context (this will trigger a re-fetch)
+              Alert.alert('Success', 'All expenses have been deleted');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear expenses');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const openScanner = async () => {
+    if (!permission) {
+      return;
+    }
+
+    if (!permission.granted) {
+      const { granted } = await requestPermission();
+      if (!granted) {
+        Alert.alert('Permission Required', 'Camera permission is needed to scan QR codes');
+        return;
+      }
+    }
+
+    setScanned(false);
+    setShowScanner(true);
+  };
+
+  const handleBarCodeScanned = async ({ data }: { data: string }) => {
+    if (scanned) return;
     
-    try {
-      const supported = await Linking.canOpenURL(gpayUrl);
-      if (supported) {
-        await Linking.openURL(gpayUrl);
-      } else {
-        // If GPay not installed, open Play Store
+    setScanned(true);
+    setShowScanner(false);
+
+    // Log the scanned data for debugging
+    console.log('Scanned QR Code:', data);
+
+    // Check if it's a UPI QR code
+    if (data.startsWith('upi://pay')) {
+      try {
+        // Parse and clean the UPI URL
+        let cleanUrl = data.trim();
+        
+        // Sometimes QR codes have extra whitespace or special characters
+        cleanUrl = cleanUrl.replace(/\s/g, '');
+        
+        // Show user what was scanned
         Alert.alert(
-          'GPay Not Installed',
-          'Would you like to install Google Pay?',
+          'UPI Payment Detected',
+          'Opening payment app...',
           [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Install', onPress: () => Linking.openURL(playStoreUrl) }
+            {
+              text: 'OK',
+              onPress: async () => {
+                try {
+                  const supported = await Linking.canOpenURL(cleanUrl);
+                  if (supported) {
+                    await Linking.openURL(cleanUrl);
+                  } else {
+                    Alert.alert('Error', 'No UPI app found. Please install GPay, PhonePe, or Paytm.');
+                  }
+                } catch (error) {
+                  console.error('Error opening UPI app:', error);
+                  Alert.alert('Error', 'Failed to open payment app. The QR code might be invalid.');
+                }
+              }
+            },
+            {
+              text: 'Cancel',
+              style: 'cancel'
+            }
           ]
         );
+      } catch (error) {
+        console.error('Error processing QR code:', error);
+        Alert.alert('Error', 'Failed to process QR code');
       }
-    } catch (error) {
-      Alert.alert('Error', 'Could not open Google Pay');
+    } else if (data.startsWith('upi://')) {
+      // Handle other UPI formats
+      Alert.alert('Invalid Format', 'This UPI QR code format is not supported for payments. Please use a standard UPI payment QR code.');
+    } else {
+      Alert.alert('Invalid QR Code', 'This is not a UPI payment QR code. Please scan a valid UPI QR code.');
     }
   };
 
@@ -65,16 +143,57 @@ export default function HomeScreen() {
           <Text style={styles.totalAmount}>₹{totalSpending.toFixed(2)}</Text>
           <Text style={styles.totalSubtext}>{expenses.length} expenses</Text>
           
-          {/* GPay Button */}
-          <TouchableOpacity style={styles.gpayButton} onPress={openGPay}>
-            <Text style={styles.gpayButtonText}>💳 Pay with GPay</Text>
+          {/* GPay QR Scanner Button */}
+          <TouchableOpacity style={styles.gpayButton} onPress={openScanner}>
+            <Text style={styles.gpayButtonText}>📷 Scan & Pay with GPay</Text>
           </TouchableOpacity>
         </View>
+
+        {/* QR Scanner Modal */}
+        <Modal
+          visible={showScanner}
+          transparent={false}
+          animationType="slide"
+          onRequestClose={() => setShowScanner(false)}
+        >
+          <View style={styles.scannerContainer}>
+            <View style={styles.scannerHeader}>
+              <Text style={styles.scannerTitle}>Scan UPI QR Code</Text>
+              <TouchableOpacity onPress={() => setShowScanner(false)} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.cameraWrapper}>
+              <CameraView
+                style={styles.camera}
+                facing="back"
+                onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+                barcodeScannerSettings={{
+                  barcodeTypes: ['qr'],
+                }}
+              />
+              <View style={styles.scannerOverlay}>
+                <View style={styles.scannerFrame} />
+                <Text style={styles.scannerInstructions}>
+                  Position the QR code within the frame
+                </Text>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         {/* Category Breakdown */}
         {categorySpending.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Spending by Category</Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Spending by Category</Text>
+              {expenses.length > 0 && (
+                <TouchableOpacity onPress={clearAllExpenses} style={styles.clearButton}>
+                  <Text style={styles.clearButtonText}>🗑️ Clear All</Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <View style={styles.categoryGrid}>
               {categorySpending.map(({ category, amount }) => (
                 <View key={category} style={styles.categoryCard}>
@@ -187,15 +306,97 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#007AFF',
   },
+  scannerContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  scannerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 50,
+    backgroundColor: '#1A1A1A',
+  },
+  scannerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  camera: {
+    flex: 1,
+  },
+  cameraWrapper: {
+    flex: 1,
+    position: 'relative',
+  },
+  scannerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scannerFrame: {
+    width: 250,
+    height: 250,
+    borderWidth: 2,
+    borderColor: '#FFF',
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+  },
+  scannerInstructions: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginTop: 30,
+    textAlign: 'center',
+    paddingHorizontal: 40,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
   section: {
     marginHorizontal: 20,
     marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: '#1A1A1A',
-    marginBottom: 16,
+  },
+  clearButton: {
+    backgroundColor: '#FF3B30',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  clearButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFF',
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -220,7 +421,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 8, 
   },
   categoryIcon: {
     fontSize: 24,
