@@ -127,7 +127,7 @@ export default function AddExpenseScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#05123d',
   },
   keyboardView: {
     flex: 1,
@@ -136,24 +136,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: 20,
-    paddingTop: 10,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 5,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
+    color: '#B0BACF',
+    marginBottom: 2,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#B0BACF',
   },
   form: {
     padding: 20,
-    paddingTop: 0,
+    paddingTop: 10,
   },
   addButton: {
-    marginTop: 8,
+    marginTop: 4,
   },
 });

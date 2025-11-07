@@ -39,13 +39,13 @@ export const CategoryPicker: React.FC<CategoryPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 8,
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    marginBottom: 8,
-    color: '#333',
+    marginBottom: 6,
+    color: '#7EA2FF',
   },
   grid: {
     flexDirection: 'row',

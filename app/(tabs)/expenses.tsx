@@ -105,21 +105,21 @@ export default function ExpensesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: '#05123d',
   },
   header: {
     padding: 20,
-    paddingTop: 10,
+    paddingTop: 60,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: '#B0BACF',
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#B0BACF',
   },
   filterContainer: {
     maxHeight: 50,
