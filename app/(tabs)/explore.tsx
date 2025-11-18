@@ -1,15 +1,16 @@
 import { ExpenseCard } from '@/components/ExpenseCard';
+import { colors } from '@/constants/colors';
 import { useExpenses } from '@/context/ExpenseContext';
 import { Category } from '@/types/expense';
 import React, { useState } from 'react';
 import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function ExpensesScreen() {
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     borderWidth: 1,
     borderColor: '#DDD',
   },
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   filterChipTextActive: {
-    color: '#FFF',
+    color: colors.primary_text,
   },
   scrollView: {
     flex: 1,
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: 60,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     borderRadius: 12,
   },
   emptyIcon: {

@@ -1,8 +1,10 @@
 import { CustomAlert } from '@/components/CustomAlert';
 import { ExpenseCard } from '@/components/ExpenseCard';
+import { PieChart } from '@/components/PieChart';
+import { colors } from '@/constants/colors';
 import { useExpenses } from '@/context/ExpenseContext';
 import { useCustomAlert } from '@/hooks/useCustomAlert';
-import { Category, CATEGORY_COLORS, CATEGORY_ICONS } from '@/types/expense';
+import { Category } from '@/types/expense';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Linking, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -127,6 +129,12 @@ export default function HomeScreen() {
     amount: getSpendingByCategory(category),
   })).filter(item => item.amount > 0);
 
+  // Calculate percentages for pie chart
+  const pieChartData = categorySpending.map(item => ({
+    ...item,
+    percentage: totalSpending > 0 ? (item.amount / totalSpending) * 100 : 0,
+  }));
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -203,22 +211,7 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               )}
             </View>
-            <View style={styles.categoryGrid}>
-              {categorySpending.map(({ category, amount }) => (
-                <View key={category} style={styles.categoryCard}>
-                  <View
-                    style={[
-                      styles.categoryIconContainer,
-                      { backgroundColor: CATEGORY_COLORS[category] + '20' },
-                    ]}
-                  >
-                    <Text style={styles.categoryIcon}>{CATEGORY_ICONS[category]}</Text>
-                  </View>
-                  <Text style={styles.categoryName}>{category}</Text>
-                  <Text style={styles.categoryAmount}>₹{amount.toFixed(2)}</Text>
-                </View>
-              ))}
-            </View>
+            <PieChart data={pieChartData} />
           </View>
         )}
 
@@ -304,7 +297,7 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 42,
     fontWeight: '700',
-    color: '#FFF',
+    color: colors.primary_text,
     marginBottom: 4,
   },
   totalSubtext: {
@@ -312,7 +305,7 @@ const styles = StyleSheet.create({
     color: '#B3D9FF',
   },
   gpayButton: {
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 25,
@@ -344,7 +337,7 @@ const styles = StyleSheet.create({
   scannerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FFF',
+    color: colors.primary_text,
   },
   closeButton: {
     width: 40,
@@ -356,7 +349,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 24,
-    color: '#FFF',
+    color: colors.primary_text,
     fontWeight: '600',
   },
   camera: {
@@ -380,12 +373,12 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     borderWidth: 2,
-    borderColor: '#FFF',
+    borderColor: colors.primary_text,
     borderRadius: 20,
     backgroundColor: 'transparent',
   },
   scannerInstructions: {
-    color: '#FFF',
+    color: colors.primary_text,
     fontSize: 16,
     fontWeight: '600',
     marginTop: 30,
@@ -419,7 +412,7 @@ const styles = StyleSheet.create({
   clearButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#FFF',
+    color: colors.primary_text,
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -427,7 +420,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   categoryCard: {
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     padding: 16,
     borderRadius: 12,
     width: '30%',
@@ -463,7 +456,7 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: 40,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     borderRadius: 12,
   },
   emptyIcon: {

@@ -1,3 +1,4 @@
+import { colors } from '@/constants/colors';
 import React from 'react';
 import { StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
 
@@ -66,12 +67,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primaryText: {
-    color: '#FFFFFF',
+    color: colors.primary_text,
   },
   secondaryText: {
-    color: '#FFFFFF',
+    color: colors.primary_text,
   },
   dangerText: {
-    color: '#FFFFFF',
+    color: colors.primary_text,
   },
 });

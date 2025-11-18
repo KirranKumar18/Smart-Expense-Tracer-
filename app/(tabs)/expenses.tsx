@@ -1,5 +1,6 @@
 import { CustomAlert } from '@/components/CustomAlert';
 import { ExpenseCard } from '@/components/ExpenseCard';
+import { colors } from '@/constants/colors';
 import { useExpenses } from '@/context/ExpenseContext';
 import { useCustomAlert } from '@/hooks/useCustomAlert';
 import { Category } from '@/types/expense';
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     borderWidth: 1,
     borderColor: '#DDD',
   },
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   filterChipTextActive: {
-    color: '#FFF',
+    color: colors.primary_text,
   },
   scrollView: {
     flex: 1,
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: 60,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     borderRadius: 12,
   },
   emptyIcon: {

@@ -1,3 +1,4 @@
+import { colors } from '@/constants/colors';
 import { CATEGORY_COLORS, CATEGORY_ICONS, Expense } from '@/types/expense';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,

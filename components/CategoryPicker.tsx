@@ -1,3 +1,4 @@
+import { colors } from '@/constants/colors';
 import { Category, CATEGORY_COLORS, CATEGORY_ICONS } from '@/types/expense';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
   },
   categoryItemSelected: {
     borderWidth: 3,

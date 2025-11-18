@@ -1,3 +1,4 @@
+import { colors } from '@/constants/colors';
 import React from 'react';
 import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.card_bg,
   },
   inputError: {
     borderColor: '#DC3545',

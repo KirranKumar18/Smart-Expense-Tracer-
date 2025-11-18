@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button';
-import { CategoryPicker } from '@/components/CategoryPicker';
+import { CategoryCarousel } from '@/components/CategoryCarousel';
 import { CustomAlert } from '@/components/CustomAlert';
 import { Input } from '@/components/Input';
 import { useExpenses } from '@/context/ExpenseContext';
@@ -7,13 +7,13 @@ import { useCustomAlert } from '@/hooks/useCustomAlert';
 import { Category } from '@/types/expense';
 import React, { useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 
 export default function AddExpenseScreen() {
@@ -121,7 +121,7 @@ export default function AddExpenseScreen() {
               onChangeText={setDate}
             />
 
-            <CategoryPicker
+            <CategoryCarousel
               selectedCategory={category}
               onSelectCategory={setCategory}
             />
