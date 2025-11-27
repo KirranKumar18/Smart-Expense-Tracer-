@@ -7,13 +7,13 @@ import { useCustomAlert } from '@/hooks/useCustomAlert';
 import { Category } from '@/types/expense';
 import React, { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
 export default function AddExpenseScreen() {
